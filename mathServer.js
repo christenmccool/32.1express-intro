@@ -1,3 +1,4 @@
+const { NONAME } = require('dns');
 const express = require('express');
 const fs = require('fs');
 
@@ -18,11 +19,18 @@ function strToNumArr(numsStr) {
 }
 
 function findMean(numsArr) {
+    if (numsArr.length === 0){
+        return NaN;
+    }
     const sum = numsArr.reduce((accum, curr) => accum + curr);
     return sum / numsArr.length;
 }
 
 function findMedian(numsArr) {
+    if (numsArr.length === 0){
+        return NaN;
+    }
+
     numsArr.sort((a, b) => (a - b));
     if (numsArr.length % 2 == 1) {
         const midInd = (numsArr.length - 1) / 2;
@@ -35,6 +43,10 @@ function findMedian(numsArr) {
 }
 
 function findMode(numsArr) {
+    if (numsArr.length === 0){
+        return NaN;
+    }
+
     const count = {};
     numsArr.forEach(element => {
         if (count[element]) {
@@ -64,9 +76,11 @@ function findMode(numsArr) {
 app.get("/mean", function(req, res, next){
     try {
         const numsStr = req.query.nums;
-        if (!numsStr) throw new ExpressError("Numbers (nums) are required.", 400);
+        const numsArr = strToNumArr(numsStr);
+        if (numsArr.length === 0) {
+            throw new ExpressError("Numbers (nums) are required.", 400);
+        }
 
-        const numsArr = strToNumArr(numsStr)
         const mean = findMean(numsArr);
 
         return res.json({ mean });
@@ -78,9 +92,10 @@ app.get("/mean", function(req, res, next){
 app.get("/median", function(req, res, next){
     try {
         const numsStr = req.query.nums;
-        if (!numsStr) throw new ExpressError("Numbers (nums) are required.", 400);
-
-        const numsArr = strToNumArr(numsStr)
+        const numsArr = strToNumArr(numsStr);
+        if (numsArr.length === 0) {
+            throw new ExpressError("Numbers (nums) are required.", 400);
+        }
         const median = findMedian(numsArr);
 
         return res.json({ median });
@@ -92,9 +107,11 @@ app.get("/median", function(req, res, next){
 app.get("/mode", function(req, res, next){
     try {
         const numsStr = req.query.nums;
-        if (!numsStr) throw new ExpressError("Numbers (nums) are required.", 400);
+        const numsArr = strToNumArr(numsStr);
+        if (numsArr.length === 0) {
+            throw new ExpressError("Numbers (nums) are required.", 400);
+        }
 
-        const numsArr = strToNumArr(numsStr)
         const mode = findMode(numsArr);
 
         return res.json({ mode });
@@ -145,5 +162,5 @@ app.listen(3000, () => {
 })
 
 
-
+module.exports = { findMean, findMedian, findMode }
 
